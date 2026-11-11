@@ -144,6 +144,27 @@ def preview_data():
         "engine": "화면 예시 · AI 요청 없음", "sample_type": "가상 예시", "tokens": None}
 
 
+@st.dialog("PRISM AI · 예시 미리보기", width="large")
+def show_preview_dialog():
+    data = preview_data()["report"]
+    st.info("가상 문서로 보는 기능 예시입니다. AI를 호출하지 않으며 현재 분석 결과는 유지됩니다.")
+    summary, datasets, evidence = st.tabs(["핵심 요약", "데이터셋", "원문 근거"])
+    with summary:
+        for item in data["findings"]:
+            st.markdown("#### " + item["category"])
+            st.text(item["text"])
+    with datasets:
+        dataset = data["datasets"][0]
+        st.markdown("#### " + dataset["name"] + " · 가상 데이터셋")
+        for fact in dataset["facts"]:
+            st.text(fact["field"] + ": " + fact["text"])
+    with evidence:
+        st.caption("실제 분석에서는 근거 버튼을 누르면 해당 PDF 페이지와 원문이 표시됩니다.")
+        st.caption("가상 PDF 1쪽")
+        st.text(data["datasets"][0]["facts"][0]["evidence"]["quote"])
+    st.caption("닫기: 오른쪽 위 × 또는 창 바깥을 누르세요.")
+
+
 def select_evidence(evidence):
     st.session_state["evidence"] = evidence
 
@@ -302,10 +323,9 @@ def main():
     with right:
         with st.container(border=True):
             st.markdown("### 먼저 화면을 살펴보세요")
-            st.text("핵심 요약과 데이터셋을 읽고, 근거 버튼으로 원문 구절을 확인할 수 있어요.")
+            st.text("핵심 요약·데이터셋·원문 근거의 예시를 팝업에서 살펴보세요.")
             if st.button("예시 화면 보기 · AI 요청 없음"):
-                sample_pages = [{"page": 1, "text": SAMPLE_TEXT}]
-                store_result(preview_data(), sample_pages, "기능 시험용 가상 논문", "preview", demo=True)
+                show_preview_dialog()
             st.caption("예시의 데이터와 수치는 가상입니다.")
     result = st.session_state.get("result")
     if result:
