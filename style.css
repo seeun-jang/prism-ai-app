@@ -123,3 +123,22 @@
 @media(max-width:640px){.st-key-prism_prep_card,.st-key-prism_source_card,.st-key-prism_preview_card{padding:17px!important;border-radius:20px!important}.prism-live-preview{min-height:325px;padding:15px 10px}.prism-card-heading p{font-size:11px}.st-key-prism_source_card [data-testid="stRadio"] label{padding:6px}.preview-scene{height:146px}.prism-card-heading{gap:10px}}
 @media(prefers-reduced-motion:reduce){.friend,.friend-eyes,.friend-orbit,.friend-spark,.prism-hero,.prism-live-preview,.preview-sticker,.preview-spark{animation:none!important}.st-key-prism_prep_card,.st-key-prism_source_card,.st-key-prism_preview_card{transition:none}}
 
+/* Three distinct friends: a book for knowledge, a prism for insight, a star for discovery. */
+.prism-friends .friend-book{width:140px;height:149px;left:62px;top:70px;border-radius:15px 22px 20px 15px;background:radial-gradient(ellipse at 25% 18%,#dff7ff,#9bd5f1 57%,#76aeda);border-left:7px solid #8ebddd;box-shadow:inset 7px 6px 13px #ffffffad,inset -9px -9px 19px #477db526,0 16px 20px -13px #6f789e38}
+.book-pages{position:absolute;left:5px;right:-3px;bottom:-7px;height:16px;border:1px solid #c1d5e6;border-radius:3px 0 12px 7px;background:repeating-linear-gradient(0deg,#fff 0 3px,#d3e2ee 3px 4px);z-index:-1;box-shadow:0 3px 4px #6486a726}
+.book-spine{position:absolute;left:3px;top:6px;bottom:7px;width:10px;border-radius:8px;border-right:1px solid #ffffff7d;background:#649ac026;box-shadow:inset 2px 0 3px #76a3c133}
+.friend-book .friend-eyes{left:22%;right:15%;top:35%;height:30%}.friend-book b{top:68%;left:44%}
+.prism-friends .friend-prism{left:194px;top:23px;width:180px;height:195px;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 9px 8px #a592c433)}
+.prism-shell,.star-shell{position:absolute;inset:0;z-index:-1;display:block}.prism-shell svg,.star-shell svg{width:100%;height:100%;display:block}
+.friend-prism::before,.friend-star::before{display:none}.friend-prism .friend-eyes{left:24%;right:24%;top:50%;height:25%;gap:6px}.friend-prism b{top:77%;height:8%;width:17%;left:44%;border-width:3px}.friend-prism::after{left:16%;width:68%;bottom:-7px}
+.prism-friends .friend-star{left:118px;top:-2px;width:101px;height:105px;background:none;box-shadow:none;border-radius:0;filter:drop-shadow(0 5px 5px #d6a79d35)}
+.friend-star .friend-eyes{left:27%;right:27%;top:40%;height:23%;gap:4px}.friend-star b{top:63%;height:6%;width:14%;left:43%;border-width:2px}.friend-star::after{width:55%;left:23%;bottom:-5px;height:10px}
+.prism-photo-empty.prism-live-preview{min-height:0;padding:12px 14px 19px;gap:0;justify-content:flex-start}
+.prism-live-preview .preview-scene{height:179px;width:260px;margin:1px auto 10px;max-width:100%}
+.preview-scene .preview-friend.friend-book{width:134px;height:142px;left:63px;top:12px;border-radius:17px 23px 22px 17px;background:radial-gradient(ellipse at 25% 18%,#e5f9ff,#a4d8f2 60%,#81b7dd);border-left:6px solid #96c1dd;box-shadow:inset 7px 8px 15px #ffffffa6,inset -10px -12px 24px #5d91bb29,0 12px 17px -10px #8d91b139}
+.preview-scene .sticker-photo{left:4px;top:71px}.preview-scene .sticker-book{right:0;top:26px}.preview-scene .spark-a{left:40px;top:9px}.preview-scene .spark-b{right:26px;bottom:9px}
+[data-testid="stMarkdownContainer"] .prism-live-preview h4{padding:0!important;margin:0 0 9px!important;font-size:18px;line-height:1.35;color:#514061}
+.prism-live-preview p{margin:0 0 12px;line-height:1.65}.prism-live-preview .preview-trail{margin:0 0 12px;gap:8px}.prism-live-preview small{font-size:11px;line-height:1.5}
+[data-testid="stPopover"]>button{border:1px solid #ddd3ed;border-radius:13px;background:#f6f1fc;color:#66488e;min-height:42px;font-size:12px}
+@media(max-width:640px){.prism-photo-empty.prism-live-preview{padding:10px 10px 16px}.prism-live-preview .preview-scene{width:240px;height:169px}.preview-scene .preview-friend.friend-book{left:58px;width:125px;height:134px}.preview-scene .sticker-photo{left:2px}.preview-scene .sticker-book{right:0}[data-testid="stMarkdownContainer"] .prism-live-preview h4{font-size:17px}.prism-live-preview p{font-size:13px}}
+

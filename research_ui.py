@@ -12,6 +12,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import streamlit as st
 
 from camera_component import live_camera
+from poster_demo import show_poster_demo
 
 FIELDS = ["자료명", "핵심 내용", "필요한 지식", "준비 방향", "확인할 사항"]
 ASSETS = Path(__file__).with_name("assets")
@@ -25,12 +26,12 @@ def card_heading(number, title, caption):
 def empty_preview():
     st.markdown('''<div class="prism-photo-empty prism-live-preview">
 <div class="preview-scene" aria-hidden="true"><span class="preview-sticker sticker-photo">▧</span>
-<div class="friend preview-friend"><div class="friend-eyes"><i></i><i></i></div><b></b></div>
+<div class="friend preview-friend friend-book"><em class="book-pages"></em><em class="book-spine"></em><div class="friend-eyes"><i></i><i></i></div><b></b></div>
 <span class="preview-sticker sticker-book">≡</span><span class="preview-spark spark-a">✦</span><span class="preview-spark spark-b">✧</span></div>
-<span class="preview-badge">작은 호기심, 새로운 발견</span><h4>어떤 도전을 준비해 볼까요?</h4>
+<h4>어떤 도전을 준비해 볼까요?</h4>
 <p>사진 속 단서를 읽고<br>나에게 필요한 책과 논문으로 연결해요.</p>
 <div class="preview-trail" aria-hidden="true"><span>사진</span><i>→</i><span>준비</span><i>→</i><span>발견</span></div>
-<small>사진을 올리거나 가상 예시로 시작해 보세요</small></div>''', unsafe_allow_html=True)
+<small>예시 화면 보기로 먼저 둘러보세요</small></div>''', unsafe_allow_html=True)
 
 
 def prepare_image(raw, max_side=1600):
@@ -180,10 +181,12 @@ def poster_workspace(url, code, error, api):
         card_heading("03", "사진 미리보기", "분석할 자료를 먼저 확인해요")
     with input_col:
         with st.container(border=True, key="prism_prep_card"):
-            card_heading("01", "나의 준비 이야기", "수준과 관심사, 준비 기간을 알려 주세요")
+            card_heading("01", "나의 준비 이야기 · 선택", "건너뛰어도 괜찮아요. 수준과 기간을 알려주면 더 반영해요")
             goal = preparation_goal(url, code, error, api)
         with st.container(border=True, key="prism_source_card"):
             card_heading("02", "도전의 단서 넣기", "사진·카메라 중 편한 방식을 골라요")
+            if st.button("예시 화면 보기 · AI 요청 없음", key="poster_demo_open"):
+                show_poster_demo()
             mode = st.radio("자료 입력", ["사진 업로드", "실시간 카메라", "간편 촬영"], horizontal=True, key="poster_input")
             raw, nonce, automatic = None, None, False
             if st.session_state.get("camera_input_error"):
