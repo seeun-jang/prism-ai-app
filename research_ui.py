@@ -1,6 +1,7 @@
 """Poster reading, spoken preparation goals, real bibliographic results."""
 import base64
 import hashlib
+import html
 import io
 import json
 import warnings
@@ -14,6 +15,22 @@ from camera_component import live_camera
 
 FIELDS = ["자료명", "핵심 내용", "필요한 지식", "준비 방향", "확인할 사항"]
 ASSETS = Path(__file__).with_name("assets")
+
+
+def card_heading(number, title, caption):
+    st.markdown(f'<div class="prism-card-heading"><span class="card-step">{html.escape(number)}</span>'
+                f'<div><h4>{html.escape(title)}</h4><p>{html.escape(caption)}</p></div></div>', unsafe_allow_html=True)
+
+
+def empty_preview():
+    st.markdown('''<div class="prism-photo-empty prism-live-preview">
+<div class="preview-scene" aria-hidden="true"><span class="preview-sticker sticker-photo">▧</span>
+<div class="friend preview-friend"><div class="friend-eyes"><i></i><i></i></div><b></b></div>
+<span class="preview-sticker sticker-book">≡</span><span class="preview-spark spark-a">✦</span><span class="preview-spark spark-b">✧</span></div>
+<span class="preview-badge">작은 호기심, 새로운 발견</span><h4>어떤 도전을 준비해 볼까요?</h4>
+<p>사진 속 단서를 읽고<br>나에게 필요한 책과 논문으로 연결해요.</p>
+<div class="preview-trail" aria-hidden="true"><span>사진</span><i>→</i><span>준비</span><i>→</i><span>발견</span></div>
+<small>사진을 올리거나 가상 예시로 시작해 보세요</small></div>''', unsafe_allow_html=True)
 
 
 def prepare_image(raw, max_side=1600):
@@ -158,56 +175,63 @@ def poster_workspace(url, code, error, api):
     st.subheader("포스터 한 장에서, 다음에 읽을 자료까지")
     st.caption("공모전·대외활동·학회 포스터를 읽고 준비에 도움이 되는 실제 도서와 논문을 찾습니다.")
     input_col, preview_col = st.columns([1.12, 1], gap="large")
+    preview_box = preview_col.container(border=True, key="prism_preview_card")
+    with preview_box:
+        card_heading("03", "사진 미리보기", "분석할 자료를 먼저 확인해요")
     with input_col:
-        goal = preparation_goal(url, code, error, api)
-        mode = st.radio("자료 입력", ["사진 업로드", "실시간 카메라", "간편 촬영"], horizontal=True, key="poster_input")
-        raw, nonce, automatic = None, None, False
-        if st.session_state.get("camera_input_error"):
-            st.error(st.session_state.pop("camera_input_error"))
-        if mode == "실시간 카메라":
-            st.caption("미리보기는 기기에서만 재생됩니다. 자동 분석은 분석이 끝난 뒤 15초 간격으로 최대 3회 전송하고, 비슷한 화면은 건너뜁니다.")
-            captured = live_camera(not bool(error), st.session_state.get("camera_ack"))
-            if captured and isinstance(captured, dict) and captured.get("id") != st.session_state.get("camera_seen"):
-                st.session_state["camera_seen"] = captured.get("id")
-                nonce = captured.get("id")
-                try:
-                    raw = base64.b64decode(captured.get("image_b64", ""), validate=True)
-                    automatic = True
-                    st.session_state["last_camera_photo"] = raw
-                except (ValueError, TypeError):
-                    st.session_state["camera_input_error"] = "촬영한 화면을 읽지 못했습니다. 다시 촬영해 주세요."
+        with st.container(border=True, key="prism_prep_card"):
+            card_heading("01", "나의 준비 이야기", "수준과 관심사, 준비 기간을 알려 주세요")
+            goal = preparation_goal(url, code, error, api)
+        with st.container(border=True, key="prism_source_card"):
+            card_heading("02", "도전의 단서 넣기", "사진·카메라 중 편한 방식을 골라요")
+            mode = st.radio("자료 입력", ["사진 업로드", "실시간 카메라", "간편 촬영"], horizontal=True, key="poster_input")
+            raw, nonce, automatic = None, None, False
+            if st.session_state.get("camera_input_error"):
+                st.error(st.session_state.pop("camera_input_error"))
+            if mode == "실시간 카메라":
+                st.caption("미리보기는 기기에서만 재생됩니다. 자동 분석은 분석이 끝난 뒤 15초 간격으로 최대 3회 전송하고, 비슷한 화면은 건너뜁니다.")
+                captured = live_camera(not bool(error), st.session_state.get("camera_ack"))
+                if captured and isinstance(captured, dict) and captured.get("id") != st.session_state.get("camera_seen"):
+                    st.session_state["camera_seen"] = captured.get("id")
+                    nonce = captured.get("id")
+                    try:
+                        raw = base64.b64decode(captured.get("image_b64", ""), validate=True)
+                        automatic = True
+                        st.session_state["last_camera_photo"] = raw
+                    except (ValueError, TypeError):
+                        st.session_state["camera_input_error"] = "촬영한 화면을 읽지 못했습니다. 다시 촬영해 주세요."
+                else:
+                    raw = st.session_state.get("last_camera_photo")
+            elif mode == "간편 촬영":
+                if st.toggle("촬영용 카메라 켜기", key="simple_camera_on"):
+                    photo = st.camera_input("포스터를 화면에 맞춰 찍어 주세요", key="simple_poster_camera")
+                    raw = photo.getvalue() if photo else None
             else:
-                raw = st.session_state.get("last_camera_photo")
-        elif mode == "간편 촬영":
-            if st.toggle("촬영용 카메라 켜기", key="simple_camera_on"):
-                photo = st.camera_input("포스터를 화면에 맞춰 찍어 주세요", key="simple_poster_camera")
-                raw = photo.getvalue() if photo else None
-        else:
-            uploaded = st.file_uploader("포스터·논문 도표 사진", type=["png", "jpg", "jpeg", "webp"],
-                                        max_upload_size=12, key="poster_upload")
-            raw = uploaded.getvalue() if uploaded else None
-        if mode != "실시간 카메라":
-            sample = ASSETS / "example_poster.png"
-            if sample.exists() and st.button("가상 공모전 포스터 불러오기", key="load_poster_sample"):
-                st.session_state["sample_poster_active"] = True
-            if raw:
-                st.session_state["sample_poster_active"] = False
-            elif st.session_state.get("sample_poster_active") and sample.exists():
-                raw = sample.read_bytes()
-                st.caption("기능 시험용 가상 포스터입니다. 실제 모집 공고가 아닙니다.")
+                uploaded = st.file_uploader("포스터·논문 도표 사진", type=["png", "jpg", "jpeg", "webp"],
+                                            max_upload_size=12, key="poster_upload")
+                raw = uploaded.getvalue() if uploaded else None
+            if mode != "실시간 카메라":
+                sample = ASSETS / "example_poster.png"
+                if sample.exists() and st.button("가상 공모전 포스터 불러오기", key="load_poster_sample"):
+                    st.session_state["sample_poster_active"] = True
+                if raw:
+                    st.session_state["sample_poster_active"] = False
+                elif st.session_state.get("sample_poster_active") and sample.exists():
+                    raw = sample.read_bytes()
+                    st.caption("기능 시험용 가상 포스터입니다. 실제 모집 공고가 아닙니다.")
     ready = False
     if raw:
         try:
             cooked, size = prepare_image(raw)
-            with preview_col:
+            with preview_box:
                 st.image(cooked, caption="분석할 사진", width=340)
                 st.caption(f"전송용 {size[0]}×{size[1]}px · {len(cooked):,}B · base64 {4*((len(cooked)+2)//3):,}자")
             ready = True
         except ValueError as exc:
             st.error(str(exc))
     if not raw:
-        with preview_col:
-            st.markdown('<div class="prism-photo-empty"><span aria-hidden="true">▧</span><h4>한 장의 사진에서 시작해요</h4><p>포스터나 도표를 올리면<br>읽은 사실과 준비 방향이 여기서 연결돼요.</p><small>아래 가상 예시로 먼저 둘러볼 수 있어요</small></div>', unsafe_allow_html=True)
+        with preview_box:
+            empty_preview()
     st.caption("분석 시 선택한 이미지와 준비 조건이 PRISM 서버와 Gemini로 전송됩니다. 얼굴·연락처·신분증이 보이는 부분은 가려 주세요.")
     clicked = st.button("포스터 읽고 자료 찾기 ↗", type="primary", disabled=not ready or bool(error), key="read_poster")
     if nonce and (not ready or error):

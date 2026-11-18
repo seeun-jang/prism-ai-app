@@ -339,6 +339,7 @@ def main():
     url, code, config_error = settings()
     with st.expander("연결 설정 및 시험"):
         motion = st.toggle("로고 빛 효과", value=True, key="logo_glow")
+        gentle_motion = st.toggle("캐릭터·배경 움직임", value=True, key="gentle_motion")
         if config_error: st.info(config_error)
         else: st.caption("연결 설정이 있습니다. 실제 연결은 아래 버튼으로 확인합니다.")
         if st.button("백엔드 확인 · AI 요청 없음", disabled=bool(config_error)):
@@ -349,6 +350,8 @@ def main():
             except ValueError as error: st.error(str(error))
         st.caption("API 키와 접근 코드는 이 화면에 표시하거나 입력하지 않습니다.")
     if not motion: st.markdown("<style>.prism-icon{filter:none}.prism-icon::before,.prism-icon::after{display:none}</style>", unsafe_allow_html=True)
+    if not gentle_motion:
+        st.markdown("<style>.friend,.friend-eyes,.friend-orbit,.friend-spark,.prism-hero,.prism-live-preview,.preview-sticker,.preview-spark{animation:none!important}</style>", unsafe_allow_html=True)
     poster_tab, paper_tab, discovery_tab = st.tabs(["포스터 분석", "논문 읽기", "도서·논문 찾기"])
     with poster_tab:
         poster_workspace(url, code, config_error, api_request)
