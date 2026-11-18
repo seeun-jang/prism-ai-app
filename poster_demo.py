@@ -4,10 +4,10 @@ from pathlib import Path
 import streamlit as st
 
 
-@st.dialog("PRISM AI · 포스터 분석 예시", width="large")
+@st.dialog("포스터 분석 예시", width="large")
 def show_poster_demo():
     st.info("사용자가 제공한 행사 포스터와 미리 작성한 설명용 결과입니다. AI 요청은 없으며, 현재 입력과 분석 결과는 바뀌지 않습니다.")
-    source, reading, resources = st.tabs(["원본 포스터", "어떻게 정리되나요?", "연결할 자료 예시"])
+    source, reading, resources = st.tabs(["원본 포스터", "정리 결과", "도서·논문"])
     with source:
         st.image(str(Path(__file__).with_name("assets") / "conference_example.png"), caption="제공된 원본 포스터")
         st.caption("포스터에 적힌 날짜·장소를 읽은 예시입니다. 현재 모집·개최 상태는 확인하지 않습니다.")
