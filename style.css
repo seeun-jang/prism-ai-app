@@ -142,3 +142,16 @@
 [data-testid="stPopover"]>button{border:1px solid #ddd3ed;border-radius:13px;background:#f6f1fc;color:#66488e;min-height:42px;font-size:12px}
 @media(max-width:640px){.prism-photo-empty.prism-live-preview{padding:10px 10px 16px}.prism-live-preview .preview-scene{width:240px;height:169px}.preview-scene .preview-friend.friend-book{left:58px;width:125px;height:134px}.preview-scene .sticker-photo{left:2px}.preview-scene .sticker-book{right:0}[data-testid="stMarkdownContainer"] .prism-live-preview h4{font-size:17px}.prism-live-preview p{font-size:13px}}
 
+
+/* Let the mobile hero grow with its copy; keep every character inside the scene. */
+@media(max-width:640px){
+.prism-hero{flex-direction:column;align-items:stretch;min-height:0;padding:24px 22px 17px;gap:10px}
+.prism-hero .prism-friends{position:relative;right:auto;bottom:auto;flex:0 0 180px;width:100%;max-width:300px;height:180px;margin:0 auto;transform:none;align-self:center}
+.prism-friends .friend-book{left:11%;top:28%;width:35%;height:62%;border-left-width:5px}
+.prism-friends .friend-prism{left:50%;top:5%;width:47%;height:87%}
+.prism-friends .friend-star{left:32%;top:0;width:26%;height:45%}
+.prism-friends .orbit-one{left:2%;top:37%;width:9px;height:9px}
+.prism-friends .orbit-two{left:92%;top:84%;width:12px;height:12px}
+.prism-friends .friend-spark{left:91%;top:0;font-size:23px}
+[data-testid="stMarkdownContainer"] .prism-hero h1{font-size:28px;word-break:keep-all;overflow-wrap:normal;letter-spacing:-1.25px}
+}
