@@ -52,6 +52,13 @@ def api_request(url, code, path, payload=None):
                 502: "AI 서버 오류입니다. Vercel 로그에서 Gemini API 키·모델 설정 또는 응답 형식을 확인해 주세요. 페이지 수를 줄이는 것만으로 해결되지 않을 수 있습니다.",
                 503: "Vercel의 API 키·접근 코드 설정과 재배포 상태를 확인해 주세요."}
     if response.status_code != 200:
+        if path in ("/analyze", "/listen", "/resources"):
+            try:
+                detail = response.json().get("detail")
+            except (ValueError, AttributeError):
+                detail = None
+            if isinstance(detail, str) and 0 < len(detail) <= 300:
+                raise ValueError(detail)
         raise ValueError(messages.get(response.status_code, f"서버 응답을 확인해 주세요. 상태 번호: {response.status_code}"))
     try:
         data = response.json()
