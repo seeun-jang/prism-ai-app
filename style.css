@@ -43,3 +43,4 @@
 @keyframes prism-sheen{0%,25%{background-position:130% 50%;opacity:0}38%,47%{opacity:.4}62%,100%{background-position:-30% 50%;opacity:0}}
 @media(prefers-reduced-motion:reduce){.prism-icon::after{animation:none!important}}
 @media(max-width:720px){[data-testid="stMainBlockContainer"]{padding:4.4rem 1rem 1.5rem}.prism-flow{font-size:12px;padding:13px 0}.prism-flow span{padding:0 5px}.prism-name{font-size:24px}.prism-tagline{font-size:12px}.prism-icon{flex-basis:41px;height:41px}[data-testid="stButton"] button,[data-testid="stDownloadButton"] button{min-height:44px}}
+

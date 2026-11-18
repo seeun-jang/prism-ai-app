@@ -10,6 +10,8 @@ import requests
 import streamlit as st
 from pypdf import PdfReader
 
+from research_ui import poster_workspace, discovery_workspace
+
 DEFAULT_QUESTION = "연구 핵심과 실제 사용한 데이터셋을 원문 근거와 함께 정리해 주세요."
 FIELDS = ["사용 목적", "규모", "데이터 분할", "전처리", "접근 링크"]
 SAMPLE_TEXT = ("기능 시험용 가상 논문이며 실제 연구 결과가 아닙니다. "
@@ -42,7 +44,8 @@ def api_request(url, code, path, payload=None):
                                     timeout=(10, 90), allow_redirects=False)
     except requests.RequestException:
         raise ValueError("백엔드에 연결하지 못했습니다. 잠시 뒤 다시 시도해 주세요.") from None
-    messages = {401: "접근 코드가 다릅니다. Streamlit과 Vercel의 APP_ACCESS_CODE를 확인해 주세요.",
+    messages = {413: "파일이 너무 큽니다. 사진 크기나 녹음 길이를 줄여 주세요.",
+                401: "접근 코드가 다릅니다. Streamlit과 Vercel의 APP_ACCESS_CODE를 확인해 주세요.",
                 404: "백엔드 주소와 PRISM 코드 배포 상태를 확인해 주세요.",
                 422: "분석 입력 형식을 확인해 주세요. 페이지 범위나 질문을 조정해 주세요.",
                 429: "AI 요청 한도에 도달했습니다. 잠시 뒤 다시 시도해 주세요.",
@@ -260,25 +263,7 @@ def show_result(result):
         st.caption(data.get("engine", ""))
 
 
-def main():
-    st.set_page_config(page_title="PRISM AI", page_icon="🔺", layout="wide")
-    css = Path(__file__).with_name("style.css")
-    if css.exists(): st.markdown("<style>" + css.read_text(encoding="utf-8") + "</style>", unsafe_allow_html=True)
-    st.markdown('<div class="prism-brand"><div class="prism-icon" role="img" aria-label="빛나는 프리즘 로고"><i></i><i></i><i></i></div><div><div class="prism-name">PRISM <span>AI</span></div><div class="prism-tagline">논문을 읽고, 연구의 핵심을 찾다.</div></div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="prism-flow">01 논문 넣기 <span>→</span> 02 핵심·데이터셋 읽기 <span>→</span> 03 원문 근거 확인 <span>→</span> 04 정리 저장</div>', unsafe_allow_html=True)
-    url, code, config_error = settings()
-    with st.expander("연결 설정 및 시험"):
-        motion = st.toggle("로고 빛 효과", value=True, key="logo_glow")
-        if config_error: st.info(config_error)
-        else: st.caption("연결 설정이 있습니다. 실제 연결은 아래 버튼으로 확인합니다.")
-        if st.button("백엔드 확인 · AI 요청 없음", disabled=bool(config_error)):
-            try:
-                info = api_request(url, code, "/")
-                if info.get("name") != "PRISM AI": raise ValueError("PRISM 백엔드 코드가 반영되었는지 확인해 주세요.")
-                st.success("PRISM 백엔드의 소개 응답을 확인했습니다.")
-            except ValueError as error: st.error(str(error))
-        st.caption("API 키와 접근 코드는 이 화면에 표시하거나 입력하지 않습니다.")
-    if not motion: st.markdown("<style>.prism-icon{filter:none}.prism-icon::before,.prism-icon::after{display:none}</style>", unsafe_allow_html=True)
+def paper_workspace(url, code, config_error):
     left, right = st.columns([3, 1], gap="large")
     pages, valid, filename, document_id = [], False, "", ""
     with left:
@@ -337,5 +322,35 @@ def main():
     st.caption("이 버전은 Gemini 기반 정보 추출입니다. 직접 학습 모델은 아직 적용하지 않았습니다. 논문과 결과는 앱 DB에 저장하지 않습니다.")
 
 
+
+def main():
+    st.set_page_config(page_title="PRISM AI", page_icon="🔺", layout="wide")
+    css = Path(__file__).with_name("style.css")
+    if css.exists(): st.markdown("<style>" + css.read_text(encoding="utf-8") + "</style>", unsafe_allow_html=True)
+    st.markdown('<div class="prism-brand"><div class="prism-icon" role="img" aria-label="빛나는 프리즘 로고"><i></i><i></i><i></i></div><div><div class="prism-name">PRISM <span>AI</span></div><div class="prism-tagline">자료를 이해하고, 다음 배움을 찾다.</div></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="prism-flow">01 사진·자료 넣기 <span>→</span> 02 준비 조건 반영 <span>→</span> 03 실제 자료 찾기 <span>→</span> 04 리서치 노트 저장</div>', unsafe_allow_html=True)
+    url, code, config_error = settings()
+    with st.expander("연결 설정 및 시험"):
+        motion = st.toggle("로고 빛 효과", value=True, key="logo_glow")
+        if config_error: st.info(config_error)
+        else: st.caption("연결 설정이 있습니다. 실제 연결은 아래 버튼으로 확인합니다.")
+        if st.button("백엔드 확인 · AI 요청 없음", disabled=bool(config_error)):
+            try:
+                info = api_request(url, code, "/")
+                if info.get("name") != "PRISM AI": raise ValueError("PRISM 백엔드 코드가 반영되었는지 확인해 주세요.")
+                st.success("PRISM 백엔드의 소개 응답을 확인했습니다.")
+            except ValueError as error: st.error(str(error))
+        st.caption("API 키와 접근 코드는 이 화면에 표시하거나 입력하지 않습니다.")
+    if not motion: st.markdown("<style>.prism-icon{filter:none}.prism-icon::before,.prism-icon::after{display:none}</style>", unsafe_allow_html=True)
+    poster_tab, paper_tab, discovery_tab = st.tabs(["포스터 분석", "논문 읽기", "도서·논문 찾기"])
+    with poster_tab:
+        poster_workspace(url, code, config_error, api_request)
+    with paper_tab:
+        paper_workspace(url, code, config_error)
+    with discovery_tab:
+        discovery_workspace(url, code, config_error, api_request)
+
+
 if __name__ == "__main__":
     main()
+
